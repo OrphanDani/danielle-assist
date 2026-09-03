@@ -93,7 +93,11 @@ Constraints:
 - Preserve the original wording's meaning; do not editorialise.
 ${SAFETY_BLOCK}`;
 
-export function meetingUserPrompt(input: { notes: string; title?: string | undefined; context?: string }) {
+export function meetingUserPrompt(input: {
+  notes: string;
+  title?: string | undefined;
+  context?: string | undefined;
+}) {
   return (
     `Task: Summarise the meeting notes below into structured output.` +
     section(
