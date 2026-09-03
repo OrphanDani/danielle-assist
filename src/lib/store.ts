@@ -11,14 +11,14 @@ export type Activity = {
   createdAt: string;
   minutesSaved: number;
   /** Only present when the user explicitly chose to save the content. */
-  content?: string;
+  content?: string | undefined;
 };
 
 export type TaskItem = {
   id: string;
   title: string;
-  owner?: string;
-  deadline?: string;
+  owner?: string | undefined;
+  deadline?: string | undefined;
   done: boolean;
   source: "planner" | "meeting" | "manual";
 };

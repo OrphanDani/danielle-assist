@@ -45,13 +45,13 @@ ${SAFETY_BLOCK}`;
 
 export function emailUserPrompt(input: {
   purpose: string;
-  keyInfo?: string;
+  keyInfo?: string | undefined;
   audience: string;
   tone: string;
   length: string;
-  cta?: string;
-  senderName?: string;
-  refinement?: string;
+  cta?: string | undefined;
+  senderName?: string | undefined;
+  refinement?: string | undefined;
 }) {
   return (
     `Task: Generate one professional email.` +
@@ -93,7 +93,7 @@ Constraints:
 - Preserve the original wording's meaning; do not editorialise.
 ${SAFETY_BLOCK}`;
 
-export function meetingUserPrompt(input: { notes: string; title?: string; context?: string }) {
+export function meetingUserPrompt(input: { notes: string; title?: string | undefined; context?: string }) {
   return (
     `Task: Summarise the meeting notes below into structured output.` +
     section(
@@ -133,9 +133,9 @@ ${SAFETY_BLOCK}`;
 export function plannerUserPrompt(input: {
   tasks: string;
   workingHours: string;
-  commitments?: string;
-  energyPreference?: string;
-  planDate?: string;
+  commitments?: string | undefined;
+  energyPreference?: string | undefined;
+  planDate?: string | undefined;
 }) {
   return (
     `Task: Prioritise the tasks and produce a time-blocked plan.` +
