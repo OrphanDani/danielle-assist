@@ -1,883 +1,160 @@
-# AI Work Companion
+# SmartWork AI — Your Intelligent Productivity Assistant
 
-MASTER PROMPT: AI-Powered Productivity Assistant
+SmartWork AI is a modern, AI-powered productivity workspace that helps professionals write polished emails, summarize meeting notes, and prioritize their day. It demonstrates how responsible AI can save real time at work — while keeping every result transparent, editable, and under human control.
 
-Project Title
+> **Demo-ready:** the app ships with sample meeting notes, sample tasks, demo activity history and default preferences, so every feature works the moment you open it — no setup required.
 
-AI Productivity Assistant – SmartWork AI
+---
 
-Project Overview
+## ✨ Features
 
-Design and develop a modern, user-friendly AI-powered Productivity Assistant that solves real-world workplace and professional productivity problems.
+### 📊 Productivity Dashboard (`/`)
+A single command center: a welcome hero, weekly metrics (emails generated, meetings summarized, tasks planned, estimated minutes saved), today's priorities, and recent activity — all backed by demo data.
 
-The application should act as a centralized workspace where users can generate professional emails, summarize meeting notes, organize tasks, prioritize workloads, and optimize their time using modern AI technologies.
+### ✉️ Smart Email Generator (`/email`)
+Generate a complete professional email from the purpose, key information, audience, tone, length and an optional call-to-action. Each result includes a subject line, greeting, body, call-to-action and sign-off, plus an "assumptions" list of anything left as a placeholder. Refine the draft (shorter / longer / change tone / more formal / more persuasive), copy it, and every output is clearly labelled AI-generated.
 
-The system should use AI effectively through tools such as ChatGPT/OpenAI APIs and can be developed using Lovable.ai or a similar AI-assisted development platform.
+Audience options: Client · Manager · Colleague · Team · Customer · Business Partner · General Professional
+Tone options: Formal · Professional · Friendly · Informal · Persuasive · Apologetic · Concise · Assertive
 
-The goal is to demonstrate how responsible AI can improve everyday workplace productivity while maintaining accuracy, transparency, privacy, and user control.
+### 🗒️ Meeting Notes Summarizer (`/meetings`)
+Turn raw, unstructured notes into a structured summary: key points, explicit decisions, action items (with owners, deadlines and status), open questions, and a "missing information" list. The AI never invents decisions, deadlines or responsibilities — absent facts are shown as *"Not specified in the meeting notes."* Action items can be imported straight into your task list.
 
-1. Project Objectives
+### 🗓️ Task Planner & Scheduler (`/planner`)
+An Eisenhower (Urgency × Importance) planner that prioritizes your tasks, builds a time-blocked daily schedule within your working hours, detects conflicts, and recommends realistic blocks with buffers. Every recommendation is a suggestion you can accept, reject or modify. Recommendations include batching, reducing context switching, adding buffers, reserving contingency time and moving flexible tasks.
 
-The application must:
+### 📈 Productivity Insights (`/insights`)
+Usage metrics, task-completion rates, per-feature usage, and a transparent **"You saved approximately X hours Y minutes this week"** summary. Time saved is clearly labelled as an **estimate**, not a guaranteed measurement.
 
-A. Address a real-world professional use case
+### 🕘 History (`/history`)
+A local-only activity log of everything you've generated. Delete individual entries or clear all. Raw content is only ever stored when you explicitly enable it in Settings.
 
-Help employees, managers, entrepreneurs, students, and professionals manage common workplace challenges such as:
+### ⚙️ Settings (`/settings`)
+Name, working hours, and a "save generated content" privacy preference, plus full disclosures about what is and isn't stored.
 
-Spending too much time writing emails
+---
 
-Struggling to summarize lengthy meetings
+## 🧠 Responsible AI by design
 
-Forgetting important action items and deadlines
+- **AI-generated content is always labelled** — every result carries a visible AI notice.
+- **Everything is editable** — drafts, summaries and plans are starting points, not final answers.
+- **No fabrication** — prompts explicitly forbid inventing decisions, deadlines, owners, names or numbers; missing facts are flagged, not guessed.
+- **Privacy-first** — raw emails, notes and tasks stay in your browser (localStorage). Content is only persisted when you opt in.
+- **User input is untrusted** — all prompts delimit user text and treat it as data, never as instructions, neutralizing prompt-injection attempts.
+- **Safe failure** — credit, rate-limit, auth and network errors map to friendly, non-technical messages.
+- **Suggestions, not commands** — plans present options to accept, reject or modify.
 
-Having difficulty prioritizing tasks
+---
 
-Poor time management
+## 🏗️ Technical architecture
 
-Information overload
+| Layer | Technology |
+| --- | --- |
+| Framework | [TanStack Start](https://tanstack.com/start) v1 (full-stack React 19, SSR/SSG, file-based routing) |
+| Language | TypeScript (strict) |
+| Styling | Tailwind CSS v4 (oklch design tokens) + shadcn/ui components |
+| AI SDK | [Vercel AI SDK](https://sdk.vercel.ai/) (`ai`) + `@ai-sdk/openai-compatible` |
+| AI provider | [Lovable AI Gateway](https://docs.lovable.dev/features/ai-gateway) (OpenAI-compatible endpoint) |
+| Default model | `google/gemini-3.7-flash` |
+| Validation | Zod (inputs and structured AI outputs) |
+| Persistence | Browser `localStorage` (no backend database required for the demo) |
 
-Repetitive administrative work
+### Secure server-side AI calls
 
-B. Utilize AI tools effectively
+All AI calls run on the server via TanStack Start `createServerFn`. The API key lives in a server-only environment variable (`LOVABLE_API_KEY`) and is **never** exposed to the browser. Inputs are validated with Zod and user text is wrapped in clearly-delimited, untrusted `USER_INPUT` blocks inside the prompts.
 
-Use modern AI capabilities to:
+### Prompt engineering architecture
 
-Generate context-aware professional content
+Every AI function uses a modular, reusable prompt built from: **Role · Context · Objective · Constraints · delimited User Input · Output Format · Validation & Safety rules.** Prompts live in `src/lib/prompts.server.ts` and return structured, Zod-validated JSON consumed internally.
 
-Summarize unstructured information
+---
 
-Extract important information
+## 📁 Project structure
 
-Classify and prioritize tasks
+```
+src/
+├── components/            # AppShell, AiNotice, ErrorBanner, ui/* (shadcn)
+├── lib/
+│   ├── ai-gateway.server.ts   # Lovable AI Gateway provider + friendly errors
+│   ├── ai.functions.ts        # generateEmail, summarizeMeeting, planTasks (server fns)
+│   ├── prompts.server.ts       # Modular structured prompts (Role/Context/…/Validation)
+│   ├── store.ts                # localStorage activities, tasks, prefs, demo data
+│   └── format.ts               # Time/date formatting + store version hook
+└── routes/
+    ├── __root.tsx        # App shell, Toaster
+    ├── index.tsx         # Dashboard
+    ├── email.tsx         # Smart Email Generator
+    ├── meetings.tsx      # Meeting Notes Summarizer
+    ├── planner.tsx       # Task Planner & Scheduler
+    ├── insights.tsx      # Productivity Insights
+    ├── history.tsx       # Activity History
+    └── settings.tsx      # Settings
+```
 
-Recommend efficient schedules
+---
 
-Provide personalized productivity suggestions
+## 🚀 Getting started
 
-Where appropriate, integrate an AI API such as OpenAI/ChatGPT.
+### Prerequisites
+- [Node.js](https://nodejs.org/) (use [nvm](https://github.com/nvm-sh/nvm) to manage versions)
+- A Lovable AI Gateway API key (set as `LOVABLE_API_KEY`)
 
-C. Demonstrate strong prompt engineering
-
-Use structured prompts containing:
-
-Clear system instructions
-
-User context
-
-Task-specific instructions
-
-Desired output format
-
-Tone requirements
-
-Audience information
-
-Constraints
-
-Examples where useful
-
-Validation and safety instructions
-
-Prompts should be modular and reusable rather than simple one-line instructions.
-
-D. Apply ethical and responsible AI practices
-
-The application must:
-
-Clearly indicate when content is AI-generated
-
-Allow users to review and edit AI outputs
-
-Avoid presenting AI suggestions as unquestionable facts
-
-Protect sensitive workplace information
-
-Minimize collection of personal data
-
-Avoid storing sensitive information unnecessarily
-
-Provide appropriate privacy notices
-
-Prevent discriminatory or harmful recommendations
-
-Encourage users to verify important information
-
-Never fabricate meeting decisions, deadlines, or responsibilities
-
-E. Demonstrate measurable productivity improvement
-
-Show users how much time and effort the assistant can save.
-
-Include a Productivity Dashboard displaying metrics such as:
-
-Emails generated
-
-Meeting notes summarized
-
-Tasks organized
-
-Estimated time saved
-
-Tasks completed
-
-Weekly productivity score
-
-Most-used AI feature
-
-Example:
-
-"You saved approximately 2 hours 35 minutes this week using SmartWork AI."
-
-The time-saving estimates should be clearly labeled as estimates, not guaranteed measurements.
-
-2. Core Feature: Smart Email Generator
-
-Create an AI-powered email generation tool.
-
-Functionality
-
-Users should enter:
-
-Purpose of the email
-
-Key information
-
-Recipient type
-
-Desired tone
-
-Desired length
-
-Optional deadline or call to action
-
-The system should generate a professional email based on the provided context.
-
-Recipient/Audience Options
-
-Provide selectable options:
-
-Client
-
-Manager
-
-Colleague
-
-Team
-
-Customer
-
-Business Partner
-
-General Professional
-
-Tone Options
-
-Allow users to select:
-
-Formal
-
-Professional
-
-Friendly
-
-Informal
-
-Persuasive
-
-Apologetic
-
-Concise
-
-Assertive
-
-Email Output
-
-Generate:
-
-Subject line
-
-Greeting
-
-Main message
-
-Call to action
-
-Closing/sign-off
-
-Allow users to:
-
-Copy email
-
-Edit email
-
-Regenerate
-
-Make shorter
-
-Make longer
-
-Change tone
-
-Make more persuasive
-
-Make more formal
-
-Example Prompt Architecture
-
-Use a structured AI prompt similar to:
-
-Role:
-You are an expert professional communication assistant.
-
-Context:
-Understand the user's purpose, audience, workplace context, and supplied information.
-
-Task:
-Generate a professional email that accurately reflects the user's intended message.
-
-Constraints:
-Do not invent facts, dates, commitments, names, or information that the user did not provide.
-
-Tone:
-Follow the user's selected tone.
-
-Output:
-Return a subject line and complete email.
-
-3. Core Feature: Meeting Notes Summarizer
-
-Create an AI tool that converts lengthy and unstructured meeting notes into concise, actionable information.
-
-Input
-
-Allow users to:
-
-Paste meeting notes
-
-Upload text-based notes
-
-Enter notes manually
-
-AI Processing
-
-The AI should identify:
-
-Summary
-
-A short overview of the meeting.
-
-Key Points
-
-Important topics discussed.
-
-Decisions
-
-Decisions that were explicitly made.
-
-Action Items
-
-Tasks that need to be completed.
-
-Responsibilities
-
-Identify who is responsible when the notes explicitly state a person or team.
-
-Deadlines
-
-Extract stated deadlines and due dates.
-
-Open Questions
-
-Identify unresolved issues requiring follow-up.
-
-Important Accuracy Rule
-
-The AI must not invent decisions, deadlines, responsibilities, or names.
-
-If information is missing, display:
-
-"Not specified in the meeting notes."
-
-Output Example
-
-Meeting Summary
-
-Brief overview of the discussion.
-
-Key Points
-
-Point 1
-
-Point 2
-
-Point 3
-
-Decisions
-
-Decision 1
-
-Decision 2
-
-Action Items
-
-TaskResponsibleDeadlineStatus Prepare reportSarahFridayPending Contact clientJohnMondayPending
-
-Open Questions
-
-Question requiring follow-up
-
-Allow users to export or copy the summary.
-
-4. Core Feature: AI Task Planner / Scheduler
-
-Develop an intelligent task planning system.
-
-User Input
-
-Allow users to enter:
-
-Task name
-
-Description
-
-Deadline
-
-Estimated duration
-
-Importance
-
-Urgency
-
-Preferred working hours
-
-Existing commitments
-
-Optional energy level/preference
-
-AI Capabilities
-
-The AI should:
-
-Organize tasks
-
-Prioritize tasks
-
-Identify urgent tasks
-
-Identify important tasks
-
-Estimate scheduling requirements
-
-Create daily plans
-
-Create weekly plans
-
-Recommend time blocks
-
-Identify potential scheduling conflicts
-
-Suggest time optimization strategies
-
-Priority System
-
-Use an Urgency × Importance framework.
-
-Classify tasks as:
-
-Urgent + Important – Do first
-
-Important + Not Urgent – Schedule
-
-Urgent + Less Important – Delegate or handle efficiently
-
-Not Urgent + Not Important – Consider postponing/removing
-
-Schedule Output
-
-Example:
-
-Monday
-
-08:30–09:00 — Review emails
-09:00–10:30 — Complete client proposal
-10:30–10:45 — Break
-10:45–11:30 — Team meeting
-11:30–12:00 — Follow-up actions
-
-Include explanations for major prioritization decisions.
-
-5. Time Optimization Recommendations
-
-The AI should provide practical productivity recommendations such as:
-
-Group similar tasks together
-
-Schedule high-focus work during preferred working hours
-
-Reduce unnecessary context switching
-
-Break large tasks into smaller actions
-
-Add realistic buffers between meetings
-
-Prioritize deadline-sensitive work
-
-Reserve time for unexpected tasks
-
-Identify overloaded days
-
-Suggest moving flexible tasks when conflicts occur
-
-Recommendations must be presented as suggestions, allowing the user to accept, reject, or modify them.
-
-6. User Interface Design
-
-Create a clean, modern, professional dashboard.
-
-Design Style
-
-Use:
-
-Modern SaaS design
-
-Clean white/light background
-
-Blue/purple AI accent colors
-
-Rounded cards
-
-Clear typography
-
-Simple navigation
-
-Responsive design
-
-Accessible color contrast
-
-Minimal visual clutter
-
-Main Navigation
-
-Create a sidebar or navigation menu containing:
-
-Dashboard
-
-Smart Email
-
-Meeting Summarizer
-
-Task Planner
-
-Productivity Insights
-
-History
-
-Settings
-
-Dashboard
-
-The dashboard should display:
-
-Welcome back!
-
-"What would you like to accomplish today?"
-
-Feature cards:
-
-✉️ Smart Email Generator
-
-📝 Meeting Notes Summarizer
-
-✅ AI Task Planner
-
-📊 Productivity Insights
-
-Also show:
-
-Today's priorities
-
-Upcoming deadlines
-
-Tasks completed
-
-Estimated time saved
-
-Recent AI activities
-
-7. Prompt Engineering Architecture
-
-Implement strong prompt engineering throughout the application.
-
-Each AI function should have a dedicated structured prompt.
-
-Use the following general framework:
-
-Role
-
-Define what the AI is.
-
-Context
-
-Provide relevant user information.
-
-Objective
-
-Clearly define what the AI must accomplish.
-
-Constraints
-
-Define what the AI must not do.
-
-Input
-
-Clearly separate user-provided information.
-
-Output Format
-
-Specify exactly how the response should be structured.
-
-Validation
-
-Require the AI to distinguish between supplied facts and assumptions.
-
-Example:
-
-"Only use information contained in the user input. If required information is unavailable, explicitly state that it was not provided. Do not fabricate names, dates, responsibilities, decisions, or commitments."
-
-Use structured outputs such as JSON internally where appropriate so the frontend can reliably display AI-generated information.
-
-8. Responsible AI Design
-
-Build responsible AI principles into the application.
-
-Transparency
-
-Display:
-
-"AI-generated content. Please review before sending or acting on it."
-
-Human Oversight
-
-Every AI-generated result must be editable.
-
-Users should have final control over:
-
-Emails
-
-Meeting summaries
-
-Tasks
-
-Priorities
-
-Schedules
-
-Privacy
-
-Do not expose sensitive workplace information unnecessarily.
-
-Avoid storing raw meeting notes or email content unless the user explicitly chooses to save them.
-
-Accuracy
-
-The system should avoid hallucinating information.
-
-For example, if a meeting note says:
-
-"John will prepare the report by Friday."
-
-The AI may extract:
-
-John → Prepare report → Friday
-
-But if the notes do not identify the responsible person, it must not guess one.
-
-9. Productivity Measurement
-
-Create a Productivity Insights page.
-
-Track:
-
-Number of emails generated
-
-Number of meetings summarized
-
-Number of tasks planned
-
-Number of tasks completed
-
-Estimated minutes saved
-
-Weekly activity
-
-Feature usage
-
-Display these using simple charts and statistics.
-
-Example:
-
-This Week
-
-Emails generated: 18
-Meetings summarized: 6
-Tasks organized: 42
-Estimated time saved: 3h 20m
-
-Add a disclaimer:
-
-"Time saved is an estimated productivity metric based on typical manual task durations and your usage. It is not a guaranteed measurement."
-
-10. Error Handling
-
-The application should gracefully handle:
-
-Empty inputs
-
-Extremely long inputs
-
-API failures
-
-Invalid data
-
-Missing deadlines
-
-Missing task information
-
-Network failures
-
-AI service interruptions
-
-Use clear messages such as:
-
-"We couldn't generate a response right now. Please try again."
-
-Do not expose technical API errors to normal users.
-
-11. Accessibility and Usability
-
-Ensure the application:
-
-Works on desktop, tablet, and mobile
-
-Uses readable typography
-
-Has accessible buttons
-
-Supports keyboard navigation
-
-Uses meaningful labels
-
-Provides loading indicators
-
-Provides clear success/error messages
-
-Does not rely only on color to communicate information
-
-12. Recommended Technical Architecture
-
-Build the application using a modern web stack.
-
-Suggested architecture:
-
-Frontend
-
-React
-
-TypeScript
-
-Tailwind CSS
-
-Modern component library
-
-Backend
-
-Secure API layer
-
-AI integration
-
-Authentication
-
-Data persistence where required
-
-AI
-
-OpenAI/ChatGPT or another suitable LLM
-
-Structured prompts
-
-Structured AI outputs
-
-Validation before displaying results
-
-Database
-Store only information necessary for application functionality.
-
-Possible data entities:
-
-Users
-
-Tasks
-
-Emails
-
-Meeting summaries
-
-Productivity metrics
-
-User preferences
-
-13. Security Requirements
-
-Never expose an AI API key in frontend code.
-
-Use secure server-side API calls.
-
-Implement:
-
-Authentication
-
-Authorization
-
-Secure API handling
-
-Input validation
-
-Rate limiting where appropriate
-
-Secure storage
-
-Protection against malicious prompt injection
-
-Treat user-provided meeting notes, emails, and task descriptions as untrusted input.
-
-14. Example User Journey
-
-Scenario: Busy Project Manager
-
-A project manager has:
-
-30 unread emails
-
-2 hours of meeting notes
-
-12 outstanding tasks
-
-Multiple deadlines
-
-They open SmartWork AI.
-
-Step 1 – Email
-
-They enter:
-
-"Ask the client for an extension on the project deadline because testing requires additional time."
-
-They select:
-
-Audience: Client
-Tone: Persuasive + Professional
-
-The AI creates a polished email.
-
-Step 2 – Meeting
-
-They paste lengthy meeting notes.
-
-The AI extracts:
-
-Summary
-
-Decisions
-
-Action items
-
-Owners
-
-Deadlines
-
-Step 3 – Task Planning
-
-They enter their outstanding tasks.
-
-The AI creates a prioritized schedule.
-
-Step 4 – Productivity Insights
-
-The dashboard estimates how much administrative time was saved.
-
-15. Success Criteria
-
-The completed application should demonstrate that AI can:
-
-Reduce time spent writing professional emails
-
-Convert lengthy meeting notes into actionable information
-
-Improve task prioritization
-
-Create realistic schedules
-
-Reduce administrative workload
-
-Improve organization
-
-Support better time management
-
-Provide measurable productivity value
-
-The application should be easy enough for a first-time user to understand without training.
-
-16. Final Deliverable
-
-Build a polished working prototype called:
-
-SmartWork AI – Your Intelligent Productivity Assistant
-
-The final product should feel like a realistic professional SaaS application rather than a simple AI chatbot.
-
-Prioritize:
-
-Usability
-
-AI functionality
-
-Prompt engineering
-
-Responsible AI
-
-Productivity measurement
-
-Professional UI/UX
-
-Reliability
-
-Make all three core AI features fully visible and accessible from the main dashboard:
-
-Smart Email Generator | Meeting Notes Summarizer | AI Task Planner
-
-Include sample/demo data so the application can be demonstrated immediately without requiring a user to enter everything manually.
-
-The final interface should clearly communicate the problem being solved, how AI is being used, and the productivity value delivered.
-
-This project was built with [Lovable](https://lovable.dev).
-
-**Live app**: https://danielle-assist.lovable.app
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/d97c193e-45bb-4858-b852-cdc232e01f05).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+### Install & run
 
 ```sh
 git clone <this-repository-url>
 cd <repository-name>
-npm i
+npm install
 npm run dev
 ```
+
+The dev server starts on `http://localhost:8080`.
+
+### Environment variables
+
+| Variable | Where | Purpose |
+| --- | --- | --- |
+| `LOVABLE_API_KEY` | server only | Authenticates AI Gateway calls; must **never** be exposed to the client |
+
+### Scripts
+
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the Vite dev server |
+| `npm run build` | Production build |
+| `npm run preview` | Preview the production build |
+| `npm run lint` | Run ESLint |
+| `npm run format` | Format with Prettier |
+
+---
+
+## 🛠️ Built with
+
+- [TanStack Start](https://tanstack.com/start) · [React 19](https://react.dev/) · [TypeScript](https://www.typescriptlang.org/)
+- [Tailwind CSS v4](https://tailwindcss.com/) · [shadcn/ui](https://ui.shadcn.com/)
+- [Vercel AI SDK](https://sdk.vercel.ai/) · [Lovable AI Gateway](https://docs.lovable.dev/features/ai-gateway)
+- [Zod](https://zod.dev/) · [TanStack Router](https://tanstack.com/router) · [TanStack Query](https://tanstack.com/query)
+
+---
+
+## 📦 Deployment
+
+SmartWork AI is built on TanStack Start and deploys to edge/serverless runtimes (e.g. Cloudflare Workers). When you connect this project to GitHub in [Lovable](https://lovable.dev), every change commits straight to your repository, and the latest preview is published automatically.
+
+---
+
+## 🔒 Privacy & data
+
+- Raw emails, notes and task descriptions are **not** persisted unless you explicitly enable "save generated content" in Settings.
+- All activity data lives in your browser's `localStorage`; clearing your browser data removes it.
+- AI requests send only the text you submit to the AI Gateway for generation — nothing else is shared.
+
+---
+
+## 📄 License
+
+This project is yours to own and extend. See your repository's license file for details.
+
+---
+
+_Built with [Lovable](https://lovable.dev) — your AI-powered app builder._
